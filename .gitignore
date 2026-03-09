@@ -1,0 +1,26 @@
+# .gitignore file create karein
+echo "# Dependencies" > .gitignore
+echo "node_modules/" >> .gitignore
+echo "" >> .gitignore
+echo "# Environment Files" >> .gitignore
+echo ".env" >> .gitignore
+echo ".env.local" >> .gitignore
+echo ".env.development" >> .gitignore
+echo ".env.production" >> .gitignore
+echo "" >> .gitignore
+echo "# Build Files" >> .gitignore
+echo "dist/" >> .gitignore
+echo "build/" >> .gitignore
+echo "" >> .gitignore
+echo "# Logs" >> .gitignore
+echo "logs/" >> .gitignore
+echo "*.log" >> .gitignore
+echo "npm-debug.log*" >> .gitignore
+echo "" >> .gitignore
+echo "# OS Files" >> .gitignore
+echo ".DS_Store" >> .gitignore
+echo "Thumbs.db" >> .gitignore
+echo "" >> .gitignore
+echo "# Uploads (but keep the folder)" >> .gitignore
+echo "backend/uploads/*" >> .gitignore
+echo "!backend/uploads/.gitkeep" >> .gitignore
