@@ -11,8 +11,14 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
   'http://localhost:4173',
+  'https://e-commercedashboard-1fz7.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:4173',
+  'http://localhost:4174',  // 👈 YEH ADD KARO
   'https://e-commercedashboard-1fz7.vercel.app'
 ];
+
 
 const corsOptions = {
   origin: function (origin, callback) {
