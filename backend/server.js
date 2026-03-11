@@ -6,20 +6,18 @@ require('dotenv').config();
 
 const app = express();
 
-// ✅ FIXED: Proper CORS configuration
+// ✅ UPDATED CORS with your frontend URL
 const corsOptions = {
-  origin: ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5174'],
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'https://e-commercedashboard-1fz7.vercel.app'  // 👈 Your live frontend URL
+  ],
   credentials: true,
   optionsSuccessStatus: 200
 };
 
 app.use(cors(corsOptions));
-
-// ✅ Alternative: Allow all origins (for development only)
-// app.use(cors({
-//   origin: '*',
-//   credentials: true
-// }));
 
 // MongoDB Connection
 const connectDB = async () => {
@@ -44,10 +42,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// ✅ Debug middleware to log all requests
+// Debug middleware
 app.use((req, res, next) => {
   console.log(`📡 ${req.method} ${req.url}`);
-  console.log('Headers:', req.headers);
   next();
 });
 
@@ -60,18 +57,38 @@ app.get('/api/test', (req, res) => {
   res.json({ 
     message: 'Server is working!',
     cors: 'enabled',
-    mongodb_status: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected'
+    mongodb_status: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected',
+    frontend_allowed: 'https://e-commercedashboard-1fz7.vercel.app'
   });
 });
 
-// Error handling middleware
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'OK',
+    mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Error handling
 app.use((err, req, res, next) => {
   console.error('❌ Error:', err.stack);
   res.status(500).json({ message: err.message });
 });
 
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ message: 'Route not found' });
+});
+
+// Export for Vercel (optional)
+module.exports = app;
+
+// Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
-  console.log(`📍 CORS enabled for: 5173, 5174, 3000`);
+  console.log(`📍 CORS enabled for: ${corsOptions.origin.join(', ')}`);
 });
