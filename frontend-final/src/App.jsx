@@ -1,35 +1,70 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import Navbar from './components/Navbar';
+import PrivateRoute from './components/PrivateRoute';
+import Login from './pages/Login';
+import ProductList from './pages/ProductList';
+import AddEditProduct from './pages/AddEditProduct';
+import ProductDetail from './pages/ProductDetail';
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+function AppContent() {
+  const { user } = useAuth();
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="app">
+      <Navbar />
+      <main className="main-content">
+        <div className="content-container">
+          <Routes>
+            <Route path="/login" element={
+              user ? <Navigate to="/products" /> : <Login />
+            } />
+            
+            <Route path="/products" element={
+              <PrivateRoute>
+                <ProductList />
+              </PrivateRoute>
+            } />
+             <Route path="/products/:id" element={
+              <PrivateRoute>
+                <ProductDetail />
+              </PrivateRoute>
+            } />
+            
+            <Route path="/add-product" element={
+              <PrivateRoute>
+                <AddEditProduct />
+              </PrivateRoute>
+            } />
+            
+            <Route path="/edit-product/:id" element={
+              <PrivateRoute>
+                <AddEditProduct />
+              </PrivateRoute>
+            } />
+
+            
+            
+            <Route path="/" element={
+              <Navigate to="/products" />
+            } />
+          </Routes>
+        </div>
+      </main>
+    </div>
+  );
 }
 
-export default App
+function App() {
+  return (
+    <Router>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </Router>
+  );
+}
+
+export default App;

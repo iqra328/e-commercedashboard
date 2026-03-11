@@ -6,46 +6,48 @@ require('dotenv').config();
 
 const app = express();
 
-// ✅ CORS Configuration - Sabhi allowed origins
+// ✅ Allowed Origins
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
+  'http://localhost:5177',   // ✅ FIX (your frontend)
   'http://localhost:4173',
-  'https://e-commercedashboard-1fz7.vercel.app',
-  'http://localhost:5173',
-  'http://localhost:5174',
-  'http://localhost:4173',
-  'http://localhost:4174',  // 👈 YEH ADD KARO
+  'http://localhost:4174',
+  'http://localhost:4175',
   'https://e-commercedashboard-1fz7.vercel.app'
 ];
 
-
+// ✅ CORS Configuration
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps, curl)
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+
+    // allow requests with no origin (mobile apps / postman)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error("CORS not allowed"));
     }
   },
   credentials: true,
-  optionsSuccessStatus: 200,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization']
 };
 
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // handle preflight
+
+// ✅ Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ✅ MongoDB Connection
 const connectDB = async () => {
   try {
     console.log('🔄 Connecting to MongoDB Atlas...');
-    await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      family: 4,
-    });
+    await mongoose.connect(process.env.MONGO_URI);
     console.log('✅ MongoDB Connected Successfully!');
   } catch (error) {
     console.error('❌ MongoDB Connection Failed:', error.message);
@@ -55,31 +57,15 @@ const connectDB = async () => {
 
 connectDB();
 
-// ✅ Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// ✅ Debug middleware
-app.use((req, res, next) => {
-  console.log(`📡 ${req.method} ${req.url}`);
-  console.log('Origin:', req.headers.origin);
-  console.log('Headers:', req.headers);
-  next();
-});
-
 // ✅ Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/products', require('./routes/productRoutes'));
 
 // ✅ Test route
 app.get('/api/test', (req, res) => {
-  res.json({ 
-    message: 'Server is working!',
-    cors: 'enabled',
-    allowed_origins: allowedOrigins,
-    origin_received: req.headers.origin || 'No origin',
-    mongodb_status: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected'
+  res.json({
+    message: "Server working",
+    origin: req.headers.origin
   });
 });
 
@@ -87,33 +73,25 @@ app.get('/api/test', (req, res) => {
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',
-    mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
-    uptime: process.uptime(),
-    timestamp: new Date().toISOString()
+    mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
   });
 });
 
-// ✅ 404 handler
-app.use((req, res) => {
-  res.status(404).json({ 
-    message: 'Route not found',
-    path: req.url
-  });
+// ✅ 404
+app.use((req,res)=>{
+  res.status(404).json({message:"Route not found"});
 });
 
-// ✅ Error handling middleware
-app.use((err, req, res, next) => {
-  console.error('❌ Error:', err.stack);
-  res.status(500).json({ 
-    message: err.message,
-    error: process.env.NODE_ENV === 'development' ? err : {}
-  });
+// ✅ Error handler
+app.use((err,req,res,next)=>{
+  console.error(err.stack);
+  res.status(500).json({message:err.message});
 });
 
 // ✅ Start server
 const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-  console.log(`📍 CORS enabled for:`, allowedOrigins);
-  console.log(`📍 Test endpoint: http://localhost:${PORT}/api/test`);
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log("🌐 Allowed origins:", allowedOrigins);
 });
