@@ -6,21 +6,7 @@ require('dotenv').config();
 
 const app = express();
 
-// ✅ Allowed Origins
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:5174',
-  'http://localhost:5177',   // ✅ FIX (your frontend)
-  'http://localhost:5175',
-  'http://localhost:4173',
-  'http://localhost:4174',
-  'http://localhost:4175',
-  'https://e-commercedashboard-1fz7.vercel.app',
-  'https://stately-nougat-47382c.netlify.app' 
-];
-
-
-// ✅ CORS Configuration - Copy paste this EXACT code
+// ✅ Allowed Origins - SIRF EK BAAR
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
@@ -33,6 +19,7 @@ const allowedOrigins = [
   'https://stately-nougat-47382c.netlify.app'
 ];
 
+// ✅ CORS Configuration - FIXED
 const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps, Postman)
@@ -42,7 +29,7 @@ const corsOptions = {
     
     // Check if origin is in allowed list
     if (allowedOrigins.indexOf(origin) !== -1) {
-      // THIS IS THE KEY - send back the actual origin, not just 'true'
+      // IMPORTANT - send back the actual origin
       callback(null, origin);
     } else {
       callback(new Error('Not allowed by CORS'));
@@ -98,15 +85,15 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// ✅ 404
-app.use((req,res)=>{
-  res.status(404).json({message:"Route not found"});
+// ✅ 404 handler
+app.use((req, res) => {
+  res.status(404).json({ message: "Route not found" });
 });
 
 // ✅ Error handler
-app.use((err,req,res,next)=>{
+app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({message:err.message});
+  res.status(500).json({ message: err.message });
 });
 
 // ✅ Start server
