@@ -15,7 +15,7 @@ const allowedOrigins = [
   'http://localhost:4173',
   'http://localhost:4174',
   'http://localhost:4175',
-  'https://e-commercedashboard-1fz7.vercel.app'
+  'https://e-commercedashboard-1fz7.vercel.app',
   'https://stately-nougat-47382c.netlify.app'
 ];
 
