@@ -19,26 +19,45 @@ const allowedOrigins = [
   'https://stately-nougat-47382c.netlify.app' 
 ];
 
-// ✅ CORS Configuration
+
+// ✅ CORS Configuration - Copy paste this EXACT code
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:5177',
+  'http://localhost:5175',
+  'http://localhost:4173',
+  'http://localhost:4174',
+  'http://localhost:4175',
+  'https://e-commercedashboard-1fz7.vercel.app',
+  'https://stately-nougat-47382c.netlify.app'
+];
+
 const corsOptions = {
   origin: function (origin, callback) {
-
-    // allow requests with no origin (mobile apps / postman)
-    if (!origin) return callback(null, origin);
-
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
+    // Allow requests with no origin (like mobile apps, Postman)
+    if (!origin) {
+      return callback(null, true);
+    }
+    
+    // Check if origin is in allowed list
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      // THIS IS THE KEY - send back the actual origin, not just 'true'
+      callback(null, origin);
     } else {
-      callback(new Error("CORS not allowed"));
+      callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
-  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization']
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // handle preflight
+
+// Handle preflight requests
+app.options('*', cors(corsOptions));
 
 // ✅ Middleware
 app.use(express.json());
