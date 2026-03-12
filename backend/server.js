@@ -16,7 +16,8 @@ const allowedOrigins = [
   'http://localhost:4174',
   'http://localhost:4175',
   'https://e-commercedashboard-1fz7.vercel.app',
-  'https://stately-nougat-47382c.netlify.app'
+  'https://stately-nougat-47382c.netlify.app',
+  'https://e-commercedashboard-u1y1.vercel.app'
 ];
 
 // ✅ CORS Configuration - FIXED
