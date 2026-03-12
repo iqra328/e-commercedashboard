@@ -24,7 +24,7 @@ const corsOptions = {
   origin: function (origin, callback) {
 
     // allow requests with no origin (mobile apps / postman)
-    if (!origin) return callback(null, true);
+    if (!origin) return callback(null, origin);
 
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
